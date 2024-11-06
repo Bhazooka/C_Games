@@ -3,57 +3,83 @@
 
 using namespace std;
 
+//ADD COLOUR LATER
+
+int player_score = 0;
+int cpu_score = 0; 
+
 class Ball {
     public:
         float x, y;
         int speed_x, speed_y;               //speed in x and y axis
         int radius;
 
-    void Draw() {
-        DrawCircle(x, y, radius, WHITE);     //(x,y,radius,colour)
-    }
-
-    void Update() {
-        // simulate movement by increasing value of the x & y position
-        x += speed_x;
-        y += speed_y;
-
-        if(y + radius >= GetScreenHeight() || y - radius <= 0) 
-        {
-            speed_y *= -1;                  //reverse speed if ball hits edge of screen (go in opposite direction)
+        void Draw() {
+            DrawCircle(x, y, radius, WHITE);     //(x,y,radius,colour)
         }
-        if(x + radius >= GetScreenWidth() || x - radius <= 0) 
-        {
-            speed_x *= -1;                  //reverse speed if ball hits edge of screen (go in opposite direction)
+
+        void Update() {
+            // simulate movement by increasing value of the x & y position
+            x += speed_x;
+            y += speed_y;
+
+            if(y + radius >= GetScreenHeight() || y - radius <= 0) 
+            {
+                speed_y *= -1;                  //reverse speed if ball hits edge of screen (go in opposite direction)
+            }
+            if(x + radius >= GetScreenWidth()){ //CPU wins
+                cpu_score++;
+                ResetBall();
+
+            }  
+            if (x - radius <= 0){
+                player_score++;
+                ResetBall();
+            }
         }
-    }
+
+        void ResetBall(){
+            x = GetScreenWidth()/2;
+            y = GetScreenHeight()/2;
+
+            /* Randomise direction ball gets thrown when starting the game by multiplying 
+               speedx & speedy by either -1(for left or down) or 1(for right and up) */
+            int speed_choices[2] = {-1,1};
+            speed_x * speed_choices[GetRandomValue(0,1)];           // Randomise speed of ball by value of 0 or 1
+            speed_y * speed_choices[GetRandomValue(0,1)];
+        }
 };
 
 class Paddle {
+    protected: 
+        void LimitMovement() {
+            if(y <= 0){
+                y = 0;                                              //restrict paddle from passing edge of y border
+            }
+            if(y + height >= GetScreenHeight()){
+                y = GetScreenHeight() - height;
+            }
+        }
+
     public:
         float x, y;
         float width, height;
         int speed;
 
-    void Draw() {
-        DrawRectangle(x, y, width, height, WHITE);              //FIRST PADDLE (x,y,width,height,colour)
-    }
+        void Draw() {
+            DrawRectangle(x, y, width, height, WHITE);              //FIRST PADDLE (x,y,width,height,colour)
+        }
 
-    void Update() {
-        if(IsKeyDown(KEY_UP)){
-            y -= speed;
+        void Update() {
+            if(IsKeyDown(KEY_UP)){
+                y -= speed;
+            }
+            if(IsKeyDown(KEY_DOWN)){
+                y += speed;
+            }
+            
+            LimitMovement();
         }
-        if(IsKeyDown(KEY_DOWN)){
-            y += speed;
-        }
-        
-        if(y <= 0){
-            y = 0;                                              //restrict paddle from passing edge of y border
-        }
-        if(y + height >= GetScreenHeight()){
-            y = GetScreenHeight() - height;
-        }
-    }
 };
 
 
@@ -68,6 +94,8 @@ class CpuPaddle: public Paddle                                  //inheritance
             if(y + height/2 <= ball_y){
                 y += speed;
             }
+
+            LimitMovement();
         }
 };
 
@@ -117,11 +145,20 @@ int main () {
         player.Update();
         cpu.Update(ball.y);
 
+        if(CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{player.x, player.y, player.width, player.height} )){
+            ball.speed_x *= -1;                                                     //Reverse ball speed
+        }
+        if(CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{cpu.x, cpu.y, cpu.width, cpu.height} )) {
+            ball.speed_x *= -1;
+        }
+
         ClearBackground(BLACK);                                                     //Clears the background, so everything redraws. To get rid of objects trace from prev frames
         DrawLine(screen_width/2, 0, screen_width/2, screen_height, WHITE);          //(startPosX, startPosY, endPosX, endPosY, color)
         ball.Draw();                                                                
         player.Draw();
         cpu.Draw();
+        DrawText(TextFormat("%i", cpu_score), screen_width/4 - 20, 20, 80, WHITE);
+        DrawText(TextFormat("%i", player_score), 3 * screen_width/4 - 20, 20, 80, WHITE);
 
         EndDrawing();
     }
