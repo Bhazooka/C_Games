@@ -23,11 +23,11 @@ class Ball {
             x += speed_x;
             y += speed_y;
 
-            if(y + radius >= GetScreenHeight() || y - radius <= 0) 
+            if(y + radius >= GetScreenHeight() || y - radius <= 0) //GetScreenHeight is bottom end of screen
             {
                 speed_y *= -1;                  //reverse speed if ball hits edge of screen (go in opposite direction)
             }
-            if(x + radius >= GetScreenWidth()){ //CPU wins
+            if(x + radius >= GetScreenWidth()){ //CPU wins. GetScreenWidth is right end of screen 
                 cpu_score++;
                 ResetBall();
 
