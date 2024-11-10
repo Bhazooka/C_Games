@@ -24,7 +24,7 @@ void Ball::Update() {
     }
 
     if (x + radius >= GetScreenWidth() || x - radius <= 0) {
-        speed_x = -speed_x * 0.9f;
+        speed_x = -speed_x * 0.2f;
         if (x + radius >= GetScreenWidth()) x = GetScreenWidth() - radius;
         if (x - radius <= 0) x = radius;
     }

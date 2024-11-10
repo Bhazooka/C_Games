@@ -8,7 +8,7 @@ class Ball : public Object {
 public:
     int radius;
     bool isRolling;
-    float inertia = 0.7f;
+    float inertia = 0.2f;
 
     Ball(float x, float y, int speed_x, int speed_y, int radius);
     void Draw() const;
