@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Ball ball(720.0f, 512.0f, 7, -7, 20);
+Ball ball(720.0f, 512.0f, 7, -7, 20); //Update to make it so that objects can be added anywhere
 
 int main() {
     cout << "Starting the game" << endl;
