@@ -1,5 +1,6 @@
 #include "Object.h"
 #include <raylib.h>
+#include <cmath>
 
 void Object::Update() {
     CheckMouseEvents();
@@ -45,4 +46,13 @@ void Object::CheckMouseEvents() {
             speed_y *= throwDamping;
         }
     }
+}
+
+void Object::CheckCollisionWith(Object& other){
+    float dx = other.x - x;
+    float dy = other.y - y;
+    float distance = sqrt(dx*dx + dy*dy);
+
+    
+
 }
