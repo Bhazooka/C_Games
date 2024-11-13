@@ -11,9 +11,14 @@ public:
     float inertia = 0.2f;
 
     Ball(float x, float y, int speed_x, int speed_y, int radius);
+    
     void Draw() const;
     void Update() override;
     void ApplyInertia() override;
+
+    //Collision Handling
+    void HandleCollision(Object& other) override;
+    Rectangle GetBoundingArea() const override;
 };
 
 #endif

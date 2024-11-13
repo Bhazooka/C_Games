@@ -5,14 +5,10 @@
 void Object::Update() {
     CheckMouseEvents();
 
-    if (isRolling) {
-        ApplyInertia();
-    }
-
     //Apply gravity and movement only if not dragging
     if (!dragging) {
-        x += speed_x;
         speed_y += gravity;
+        x += speed_x;
         y += speed_y;
     }
 }
@@ -48,11 +44,25 @@ void Object::CheckMouseEvents() {
     }
 }
 
+//Collision with other objects
 void Object::CheckCollisionWith(Object& other){
-    float dx = other.x - x;
-    float dy = other.y - y;
-    float distance = sqrt(dx*dx + dy*dy);
+    //If the bounding areas intersect, deligate specific-shapes to handle collision
+    if(CheckCollisionRecs(GetBoundingArea(), other.GetBoundingArea())){ 
+        /*  
+            Call HandleCollision on the current object (this) to let it
+            handle its response to colliding with other object.
+            Each object can define its own specific collision response,
+            allowing different shapes (like circles & squares) to handle
+            collisions uniquely. 
+        */
+        this->HandleCollision(other);
+        /*  
+            Call HandleCollision on 'other' object to allow it 
+            to respond to colliding with the current object (this).
+            This enables both objects to adjust their position, speed, 
+            and behavior based on the collision interaction.
+        */
+        other.HandleCollision(*this);
 
-    
-
-}
+    }
+};
