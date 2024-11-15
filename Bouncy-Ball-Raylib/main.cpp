@@ -2,10 +2,13 @@
 #include <iostream>
 #include <raylib.h>
 #include "Ball.h"
+#include "Box.h"
 
 using namespace std;
 
 Ball ball(720.0f, 512.0f, 7, -7, 20); //Update to make it so that objects can be added anywhere
+
+Box box(723.0f, 200.1f, 20, 20); //Place the ball object
 
 int main() {
     cout << "Starting the game" << endl;
