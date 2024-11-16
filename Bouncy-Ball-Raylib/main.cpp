@@ -8,7 +8,7 @@ using namespace std;
 
 Ball ball(720.0f, 512.0f, 7, -7, 20); //Update to make it so that objects can be added anywhere
 
-Box box(723.0f, 200.1f, 20, 20); //Place the ball object
+Box box(723.0f, 250.0F, 7, -7, 40, 40); //Place the ball object
 
 int main() {
     cout << "Starting the game" << endl;
@@ -22,10 +22,12 @@ int main() {
 
     while (!WindowShouldClose()) {
         ball.Update();
+        box.Update();
 
         BeginDrawing();
         ClearBackground(BLACK);
         ball.Draw();
+        box.Draw();
         EndDrawing();
     }
 

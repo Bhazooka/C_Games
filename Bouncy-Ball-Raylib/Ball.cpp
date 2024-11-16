@@ -16,10 +16,6 @@ void Ball::Draw() const {
 
 void Ball::Update() {
     Object::Update();
-    
-    if (isRolling) {
-        ApplyInertia();
-    }
 
     if (y + radius >= GetScreenHeight() || y - radius <= 0) {
         speed_y = -speed_y * 0.9f;

@@ -9,12 +9,15 @@ class Box : public Object {
 public:
     float width, height;
     float rotation = 0.0f;
+    float inertia = 0.9f;
     bool onFlatSide = true;
 
-    Box(float x, float y, float width, float height);
+    Box(float x, float y, int speed_x, int speed_y, float width, float height);
 
     void Update() override;
     void Draw() const;
+
+    //Collision
     void HandleCollision(Object& other) override;
     Rectangle GetBoundingArea() const override; 
 

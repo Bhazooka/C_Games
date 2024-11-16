@@ -4,6 +4,10 @@
 
 void Object::Update() {
     CheckMouseEvents();
+        
+    if (isRolling) {
+        ApplyInertia();
+    }
 
     //Apply gravity and movement only if not dragging
     if (!dragging) {
