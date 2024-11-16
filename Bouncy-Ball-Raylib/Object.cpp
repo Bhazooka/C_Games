@@ -20,33 +20,35 @@ void Object::Update() {
 void Object::CheckMouseEvents() {
     Vector2 currentMousePos = GetMousePosition();
 
+    // Check if the mouse is clicking within the bounding area
+    Rectangle boundingArea = GetBoundingArea();
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-        CheckCollisionPointCircle(currentMousePos, {x, y}, 20)) { 
+        CheckCollisionPointRec(currentMousePos, boundingArea)) {
         dragging = true;
-        speed_x = speed_y = 0;                  //Stop movement while dragging
+        speed_x = speed_y = 0; // Stop movement while dragging
         lastMousePos = currentMousePos;
     }
 
-    //While dragging, update position and calculate speed
+    // While dragging, update position and calculate speed
     if (dragging) {
-        x = currentMousePos.x;
-        y = currentMousePos.y;
+        x = currentMousePos.x - boundingArea.width / 2; // Align box center to mouse
+        y = currentMousePos.y - boundingArea.height / 2;
 
-        //Calculate velocity based on the difference in mouse position
-        //THERE HAS TO BE A BETTER WAY TO DO THIS
-        speed_x = (currentMousePos.x - lastMousePos.x);
-        speed_y = (currentMousePos.y - lastMousePos.y);
+        // Calculate velocity based on the difference in mouse position
+        speed_x = currentMousePos.x - lastMousePos.x;
+        speed_y = currentMousePos.y - lastMousePos.y;
         lastMousePos = currentMousePos;
 
-        //Stop dragging when mouse is released
+        // Stop dragging when mouse is released
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             dragging = false;
-            //Apply throw damping to smooth out release
+            // Apply throw damping to smooth out release
             speed_x *= throwDamping;
             speed_y *= throwDamping;
         }
     }
 }
+
 
 //Collision with other objects
 void Object::CheckCollisionWith(Object& other){

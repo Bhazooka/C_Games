@@ -20,7 +20,7 @@ void Box::Draw() const {
 
     Vector2 origin = { width/2, height/2 };         //center of rectangle
     // Draw rectangle with proper center alignment and rotation
-    Rectangle rect = { x - width/2, y - height/2, width, height };
+    Rectangle rect = { x + width/2, y + height/2, width, height };
     DrawRectanglePro(rect, origin, rotation, WHITE);
 }
 
