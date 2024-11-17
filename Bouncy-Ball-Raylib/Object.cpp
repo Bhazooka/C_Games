@@ -31,8 +31,8 @@ void Object::CheckMouseEvents() {
 
     // While dragging, update position and calculate speed
     if (dragging) {
-        x = currentMousePos.x - boundingArea.width / 2; // Align box center to mouse
-        y = currentMousePos.y - boundingArea.height / 2;
+        x = currentMousePos.x; // Align box center to mouse
+        y = currentMousePos.y;
 
         // Calculate velocity based on the difference in mouse position
         speed_x = currentMousePos.x - lastMousePos.x;

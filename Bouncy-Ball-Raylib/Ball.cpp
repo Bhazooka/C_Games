@@ -1,5 +1,6 @@
 #include "Ball.h"
 #include <cmath>
+#include <utility>
 
 Ball::Ball(float x, float y, int speed_x, int speed_y, int radius) {
     this->x = x;
@@ -56,9 +57,71 @@ Rectangle Ball::GetBoundingArea() const {
 }
 
 //
-void Ball::HandleCollision(Object& other){
-    // COMPLETE FUNCTION TO HANDLE COLLISION FOR BALLS
-    
+void Ball::HandleCollision(Object& other) {
+    // Get bounding areas
+    Rectangle thisBounding = GetBoundingArea();
+    Rectangle otherBounding = other.GetBoundingArea();
+
+    // Ensure bounding areas overlap
+    if (!CheckCollisionRecs(thisBounding, otherBounding)) {
+        return;
+    }
+
+    // Calculate the center-to-center vector
+    float deltaX = x - other.x;
+    float deltaY = y - other.y;
+    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    // Handling ball-to-ball collisions (circle-to-circle)
+    if (auto* otherBall = dynamic_cast<Ball*>(&other)) {
+        float combinedRadius = radius + otherBall->radius;
+
+        // Check if the circles are overlapping
+        if (distance < combinedRadius) {
+            // Resolve overlap by moving the balls apart
+            float overlap = combinedRadius - distance;
+            float separationFactor = 0.5f; // Distribute movement equally
+            x += (deltaX / distance) * overlap * separationFactor;
+            y += (deltaY / distance) * overlap * separationFactor;
+
+            other.x -= (deltaX / distance) * overlap * separationFactor;
+            other.y -= (deltaY / distance) * overlap * separationFactor;
+
+            // Exchange velocities (simplified elastic collision)
+            std::swap(speed_x, otherBall->speed_x);
+            std::swap(speed_y, otherBall->speed_y);
+
+            // Apply damping to simulate energy loss
+            speed_x *= 0.9f;
+            speed_y *= 0.9f;
+            otherBall->speed_x *= 0.9f;
+            otherBall->speed_y *= 0.9f;
+        }
+    } else {
+        // Collision with non-ball objects (e.g., boxes)
+        // Reflect velocity along the axis of least penetration
+        float overlapX = (radius + otherBounding.width / 2) - fabs(deltaX);
+        float overlapY = (radius + otherBounding.height / 2) - fabs(deltaY);
+
+        if (overlapX < overlapY) {
+            // Resolve collision in x-axis
+            if (deltaX > 0) {
+                x += overlapX;
+            } else {
+                x -= overlapX;
+            }
+            speed_x = -speed_x * 0.9f;
+        } else {
+            // Resolve collision in y-axis
+            if (deltaY > 0) {
+                y += overlapY;
+            } else {
+                y -= overlapY;
+            }
+            speed_y = -speed_y * 0.9f;
+        }
+    }
 }
+
 
 

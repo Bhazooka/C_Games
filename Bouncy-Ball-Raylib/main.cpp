@@ -7,6 +7,7 @@
 using namespace std;
 
 Ball ball(720.0f, 512.0f, 7, -7, 20); //Update to make it so that objects can be added anywhere
+Ball ball2(320.0f, 612.0f, 9, -3, 20); //Update to make it so that objects can be added anywhere
 
 Box box(723.0f, 250.0F, 7, -7, 40, 40); //Place the ball object
 
@@ -22,11 +23,13 @@ int main() {
 
     while (!WindowShouldClose()) {
         ball.Update();
+        ball2.Update();
         box.Update();
 
         BeginDrawing();
         ClearBackground(BLACK);
         ball.Draw();
+        ball2.Draw();
         box.Draw();
         EndDrawing();
     }
