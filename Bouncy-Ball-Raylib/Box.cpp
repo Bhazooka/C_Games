@@ -18,9 +18,20 @@ void Box::Draw() const {
     // // DrawRectangle(static_cast<int>(x), static_cast<int>(y), width, height, WHITE);
     // DrawRectanglePro({x, y, width, height}, origin, rotation, WHITE);
 
+
+/*
     Vector2 origin = { width/2, height/2 };         //center of rectangle
     // Draw rectangle with proper center alignment and rotation
     Rectangle rect = { x + width/2, y + height/2, width, height };
+    DrawRectanglePro(rect, origin, rotation, WHITE);
+*/
+
+
+
+
+    Vector2 origin = { width/2 , height/2 };         //center of rectangle
+    // Draw rectangle with proper center alignment and rotation
+    Rectangle rect = { x, y, width, height };
     DrawRectanglePro(rect, origin, rotation, WHITE);
 }
 
