@@ -1,6 +1,7 @@
 #include "Box.h"
 #include <cmath>
 #include "raymath.h"
+#include "Ball.h"
 
 Box::Box(float x, float y, int speed_x, int speed_y, float width, float height) {
     this->x = x;
@@ -18,42 +19,37 @@ void Box::Draw() const {
     // // DrawRectangle(static_cast<int>(x), static_cast<int>(y), width, height, WHITE);
     // DrawRectanglePro({x, y, width, height}, origin, rotation, WHITE);
 
-
-/*
-    Vector2 origin = { width/2, height/2 };         //center of rectangle
-    // Draw rectangle with proper center alignment and rotation
-    Rectangle rect = { x + width/2, y + height/2, width, height };
-    DrawRectanglePro(rect, origin, rotation, WHITE);
-*/
-
-
-
-
-    Vector2 origin = { width/2 , height/2 };         //center of rectangle
-    // Draw rectangle with proper center alignment and rotation
+    Vector2 origin = { 0.0f , 0.0f };         //center of rectangle
     Rectangle rect = { x, y, width, height };
-    DrawRectanglePro(rect, origin, rotation, WHITE);
+    DrawRectanglePro(rect, origin, 0.5f, WHITE);
 }
 
 void Box::Update() {
-    Object::Update();      
+    Object::Update();
 
-    if(!onFlatSide){
+    if (!onFlatSide) {
         ApplyInertia();
     }
 
-    if (y + height >= GetScreenHeight() || y - height <= 0) {
+    //boundary conditions to ensure proper collision with edges
+    if (y + height >= GetScreenHeight()) {
         speed_y = -speed_y * 0.1f;
-        if(y + height >= GetScreenHeight()) y = GetScreenHeight() - height;
-        if(y - height <= 0) y = height;
+        y = GetScreenHeight() - height; //touch and stop at bottom edge
+    } else if (y <= 0) {
+        speed_y = -speed_y * 0.1f;
+        y = 0; // Adjust position to touch top edge
     }
 
-    if (x + width >= GetScreenWidth() || x - width <= 0) {
+    if (x + width >= GetScreenWidth()) {
         speed_x = -speed_x * 0.1f;
-        if(x + width >= GetScreenWidth()) x = GetScreenWidth() - width;
-        if(x - width <= 0) x = width;
+        x = GetScreenWidth() - width; // Adjust position to touch right edge
+    } else if (x <= 0) {
+        speed_x = -speed_x * 0.1f;
+        x = 0; // Adjust position to touch left edge
     }
 }
+
+
 
 //REVIEW THIS METHOD
 void Box::ApplyInertia() {
@@ -76,22 +72,69 @@ void Box::FlipOnCollision() {
 
 
 void Box::HandleCollision(Object& other) {
-    // COMPLETE FUNCTION TO HANDLE COLLISION FOR SQUARES
-
-    //Get the bounding area for both objects
-    Rectangle otherBounding = other.GetBoundingArea();
     Rectangle thisBounding = GetBoundingArea();
-    // Check for overlap between bounding rectangles
-    if (CheckCollisionRecs(thisBounding, otherBounding)) {
-        //Simple response: invert velocity in both x and 
-        speed_x = -speed_x * 0.8f;
-        speed_y = -speed_y * 0.8f;
-        //Adjust position to avoid overlap
-        if (other.y > y) y -= height/2;
+    Rectangle otherBounding = other.GetBoundingArea();
 
-        FlipOnCollision();
+    if (!CheckCollisionRecs(thisBounding, otherBounding)) {
+        return;
+    }
+
+    float deltaX = x - other.x;
+    float deltaY = y - other.y;
+
+    if (auto* otherBox = dynamic_cast<Box*>(&other)) {
+        // Box-to-Box collision
+        float overlapX = (width / 2 + otherBox->width / 2) - fabs(deltaX);
+        float overlapY = (height / 2 + otherBox->height / 2) - fabs(deltaY);
+
+        if (overlapX < overlapY) {
+            // Resolve x-axis collision
+            if (deltaX > 0) {
+                x += overlapX * 0.5f;
+                other.x -= overlapX * 0.5f;
+            } else {
+                x -= overlapX * 0.5f;
+                other.x += overlapX * 0.5f;
+            }
+            speed_x = -speed_x * 0.9f;
+            other.speed_x = -other.speed_x * 0.9f;
+        } else {
+            // Resolve y-axis collision
+            if (deltaY > 0) {
+                y += overlapY * 0.5f;
+                other.y -= overlapY * 0.5f;
+            } else {
+                y -= overlapY * 0.5f;
+                other.y += overlapY * 0.5f;
+            }
+            speed_y = -speed_y * 0.9f;
+            other.speed_y = -other.speed_y * 0.9f;
+        }
+    } else if (auto* otherBall = dynamic_cast<Ball*>(&other)) {
+        // If `other` is a Ball, `otherBall` is a pointer to it.
+        // Handle ball-to-ball collision logic here.
+        // Box-to-Ball collision
+        float overlapX = (width / 2 + otherBall->radius) - fabs(deltaX);
+        float overlapY = (height / 2 + otherBall->radius) - fabs(deltaY);
+
+        if (overlapX < overlapY) {
+            if (deltaX > 0) {
+                otherBall->x += overlapX;
+            } else {
+                otherBall->x -= overlapX;
+            }
+            otherBall->speed_x = -otherBall->speed_x * 0.9f;
+        } else {
+            if (deltaY > 0) {
+                otherBall->y += overlapY;
+            } else {
+                otherBall->y -= overlapY;
+            }
+            otherBall->speed_y = -otherBall->speed_y * 0.9f;
+        }
     }
 }
+
 
 
 Rectangle Box::GetBoundingArea() const{

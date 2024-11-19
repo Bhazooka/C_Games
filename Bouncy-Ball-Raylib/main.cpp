@@ -37,3 +37,19 @@ int main() {
     CloseWindow();
     return 0;
 }
+
+
+
+
+/*
+
+    TODO:
+    - Object Collision
+    - Upon collision, objects react according to laws of physics
+        - Add force (direction of the force applied)
+        - Add weight to objects for more accurate collisions
+    - Toggle gravity on and off (PRESS G)
+    - Press Button to make mouse cursor a repelant
+    - Select Object and it Create in real time
+
+*/

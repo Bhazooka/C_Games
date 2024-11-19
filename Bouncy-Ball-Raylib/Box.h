@@ -8,7 +8,7 @@
 class Box : public Object {
 public:
     float width, height;
-    float rotation = 0.0f;
+    float rotation = 0.0f;      // FIX ROTATION LATER
     float inertia = 0.9f;
     bool onFlatSide = true;
 

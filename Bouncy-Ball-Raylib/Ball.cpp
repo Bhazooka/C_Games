@@ -56,7 +56,9 @@ Rectangle Ball::GetBoundingArea() const {
     return{x - radius, y - radius, radius * 2, radius * 2};
 }
 
-//
+
+
+// FOR SOME REASON THIS DOES NOT WORK
 void Ball::HandleCollision(Object& other) {
     // Get bounding areas
     Rectangle thisBounding = GetBoundingArea();
@@ -72,22 +74,26 @@ void Ball::HandleCollision(Object& other) {
     float deltaY = y - other.y;
     float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
 
-    // Handling ball-to-ball collisions (circle-to-circle)
     if (auto* otherBall = dynamic_cast<Ball*>(&other)) {
+        // If `other` is a Ball, `otherBall` is a pointer to it.
+        // Handle ball-to-ball collision logic here.
+        // Ball-to-Ball collision
         float combinedRadius = radius + otherBall->radius;
 
-        // Check if the circles are overlapping
         if (distance < combinedRadius) {
-            // Resolve overlap by moving the balls apart
+            // Resolve overlap
             float overlap = combinedRadius - distance;
             float separationFactor = 0.5f; // Distribute movement equally
+
+            // Move this ball
             x += (deltaX / distance) * overlap * separationFactor;
             y += (deltaY / distance) * overlap * separationFactor;
 
-            other.x -= (deltaX / distance) * overlap * separationFactor;
-            other.y -= (deltaY / distance) * overlap * separationFactor;
+            // Move the other ball
+            otherBall->x -= (deltaX / distance) * overlap * separationFactor;
+            otherBall->y -= (deltaY / distance) * overlap * separationFactor;
 
-            // Exchange velocities (simplified elastic collision)
+            // Exchange velocities
             std::swap(speed_x, otherBall->speed_x);
             std::swap(speed_y, otherBall->speed_y);
 
@@ -98,13 +104,12 @@ void Ball::HandleCollision(Object& other) {
             otherBall->speed_y *= 0.9f;
         }
     } else {
-        // Collision with non-ball objects (e.g., boxes)
-        // Reflect velocity along the axis of least penetration
+        // Ball-to-Box collision (or other shapes)
         float overlapX = (radius + otherBounding.width / 2) - fabs(deltaX);
         float overlapY = (radius + otherBounding.height / 2) - fabs(deltaY);
 
         if (overlapX < overlapY) {
-            // Resolve collision in x-axis
+            // Resolve collision along the x-axis
             if (deltaX > 0) {
                 x += overlapX;
             } else {
@@ -112,7 +117,7 @@ void Ball::HandleCollision(Object& other) {
             }
             speed_x = -speed_x * 0.9f;
         } else {
-            // Resolve collision in y-axis
+            // Resolve collision along the y-axis
             if (deltaY > 0) {
                 y += overlapY;
             } else {
@@ -122,6 +127,7 @@ void Ball::HandleCollision(Object& other) {
         }
     }
 }
+
 
 
 
