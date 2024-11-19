@@ -71,6 +71,63 @@ void Box::FlipOnCollision() {
 }
 
 
+
+
+Rectangle Box::GetBoundingArea() const{
+    /* 
+        Returns an axis-aligned bounding box (AABB) centered on the box's position.
+        The bounding box is used in broad-phase collision detection to identify potential 
+        overlaps with other objects. The returned Rectangle defines the area extending 
+        from the calculated top-left corner (x - width/2, y - height/2) to the specified 
+        width and height.
+
+        - (x - width/2, y - height/2): calculates the top-left corner of the box's bounding area.
+        - width and height: specify the dimensions of the rectangle, 
+        extending equally from the box's center (x, y) on all sides.
+    */
+    return {x - width/2, y - height/2, width, height};
+}
+
+
+
+
+void Box::HandleCollision(Object& other) {
+    // Circle-to-Rectangle collision
+    if (auto* otherBall = dynamic_cast<Ball*>(&other)) {
+        Vector2 circleCenter = { otherBall->x, otherBall->y };
+        float radius = otherBall->radius;
+        Rectangle boxBounds = GetBoundingArea();
+
+        if (CheckCollisionCircleRec(circleCenter, radius, boxBounds)) {
+            // Resolve collision (e.g., reverse velocity, adjust positions)
+            float overlapX = radius + width / 2 - fabs(circleCenter.x - x);
+            float overlapY = radius + height / 2 - fabs(circleCenter.y - y);
+
+            if (overlapX < overlapY) {
+                otherBall->speed_x = -otherBall->speed_x * 0.9f;  // Dampen speed
+            } else {
+                otherBall->speed_y = -otherBall->speed_y * 0.9f;  // Dampen speed
+            }
+        }
+    } 
+    // Rectangle-to-Rectangle collision
+    else if (auto* otherBox = dynamic_cast<Box*>(&other)) {
+        if (CheckCollisionRecs(GetBoundingArea(), otherBox->GetBoundingArea())) {
+            // Example: reverse velocity on collision
+            speed_x = -speed_x * 0.9f;
+            speed_y = -speed_y * 0.9f;
+
+            otherBox->speed_x = -otherBox->speed_x * 0.9f;
+            otherBox->speed_y = -otherBox->speed_y * 0.9f;
+        }
+    }
+}
+
+
+
+
+/*
+
 void Box::HandleCollision(Object& other) {
     Rectangle thisBounding = GetBoundingArea();
     Rectangle otherBounding = other.GetBoundingArea();
@@ -136,18 +193,4 @@ void Box::HandleCollision(Object& other) {
 }
 
 
-
-Rectangle Box::GetBoundingArea() const{
-    /* 
-        Returns an axis-aligned bounding box (AABB) centered on the box's position.
-        The bounding box is used in broad-phase collision detection to identify potential 
-        overlaps with other objects. The returned Rectangle defines the area extending 
-        from the calculated top-left corner (x - width/2, y - height/2) to the specified 
-        width and height.
-
-        - (x - width/2, y - height/2): calculates the top-left corner of the box's bounding area.
-        - width and height: specify the dimensions of the rectangle, 
-        extending equally from the box's center (x, y) on all sides.
-    */
-    return {x - width/2, y - height/2, width, height};
-}
+*/ 

@@ -1,4 +1,5 @@
 #include "Ball.h"
+#include "Box.h"
 #include <cmath>
 #include <utility>
 
@@ -57,6 +58,48 @@ Rectangle Ball::GetBoundingArea() const {
 }
 
 
+
+// FOR SOME REASON THIS DOES NOT WORK
+
+void Ball::HandleCollision(Object& other) {
+    // Circle-to-Circle collision
+    if (auto* otherBall = dynamic_cast<Ball*>(&other)) {
+        Vector2 thisCenter = { x, y };
+        Vector2 otherCenter = { otherBall->x, otherBall->y };
+
+        if (CheckCollisionCircles(thisCenter, radius, otherCenter, otherBall->radius)) {
+            // Example: exchange velocities (simplified elastic collision)
+            std::swap(speed_x, otherBall->speed_x);
+            std::swap(speed_y, otherBall->speed_y);
+
+            // Apply damping
+            speed_x *= 0.9f;
+            speed_y *= 0.9f;
+            otherBall->speed_x *= 0.9f;
+            otherBall->speed_y *= 0.9f;
+        }
+    } 
+    // Circle-to-Rectangle collision
+    else if (auto* otherBox = dynamic_cast<Box*>(&other)) {
+        Vector2 circleCenter = { x, y };
+        Rectangle boxBounds = otherBox->GetBoundingArea();
+
+        if (CheckCollisionCircleRec(circleCenter, radius, boxBounds)) {
+            // Example: reverse velocity or adjust positions
+            float overlapX = radius + otherBox->width / 2 - fabs(circleCenter.x - otherBox->x);
+            float overlapY = radius + otherBox->height / 2 - fabs(circleCenter.y - otherBox->y);
+
+            if (overlapX < overlapY) {
+                speed_x = -speed_x * 0.9f;
+            } else {
+                speed_y = -speed_y * 0.9f;
+            }
+        }
+    }
+}
+
+
+/*
 
 // FOR SOME REASON THIS DOES NOT WORK
 void Ball::HandleCollision(Object& other) {
@@ -128,6 +171,6 @@ void Ball::HandleCollision(Object& other) {
     }
 }
 
-
+*/
 
 
