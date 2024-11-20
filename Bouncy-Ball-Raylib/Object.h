@@ -17,6 +17,7 @@ public:
     virtual void Update();
     virtual void ApplyInertia() { }        
     void CheckMouseEvents();
+    virtual void Draw() const = 0;
 
     //Collisions handling
     void CheckCollisionWith(Object& other);
